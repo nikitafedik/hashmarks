@@ -1,0 +1,35 @@
+# Load bookmarks from BOOKMARK_FILE into named directory hash table.
+
+init_bookmarks() {
+  emulate -L zsh
+  set -o errexit -o nounset -o pipefail 2>/dev/null || true
+
+  # Remove previously loaded bookmarks from the hash table
+  local key
+  for key in "${BOOKMARKS_LOADED[@]}"; do
+    hash -d -- "$key" 2>/dev/null || true
+  done
+  BOOKMARKS_LOADED=()
+
+  # Load from file if exists
+  if [[ -f "$BOOKMARK_FILE" ]]; then
+    # Read lines safely; skip empty or malformed
+    while IFS='=' read -r key dir; do
+      [[ -z "$key" || -z "$dir" ]] && continue
+      # Expand leading ~ to HOME
+      case "$dir" in
+        "~"*) dir="${dir/#\~/$HOME}" ;;
+      esac
+      # Only set if directory exists; tolerate non-existent but warn
+      if [[ -d "$dir" ]]; then
+        hash -d -- "$key=$dir" 2>/dev/null || true
+        BOOKMARKS_LOADED+=("$key")
+      else
+        # Still set, but it may break tilde usage for that key; choose policy:
+        # Comment next two lines to skip non-existent targets.
+        hash -d -- "$key=$dir" 2>/dev/null || true
+        BOOKMARKS_LOADED+=("$key")
+      fi
+    done < "$BOOKMARK_FILE"
+  fi
+}

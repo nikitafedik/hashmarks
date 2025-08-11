@@ -1,0 +1,6 @@
+# Completion for 'b' is trivial; no args.
+
+#compdef b
+_b() {
+  _arguments -C
+}

@@ -1,0 +1,22 @@
+# Complete keys by suggesting basename of PWD or existing keys (to hint overwrite)
+# Also complete directories as second argument.
+
+#compdef ba
+_ba() {
+  _arguments -C \
+    '(-f)--force[force overwrite]' \
+    '(-f)-f[force overwrite]' \
+    '1:key:->key' \
+    '2:directory:_path_files -/' && return
+
+  case $state in
+    key)
+      local -a suggestions
+      suggestions=("${PWD:t}")
+      local -a existing
+      existing=($(_call_program keys awk -F= 'NF{print $1}' -- "${BOOKMARK_FILE:-$HOME/.zsh_hashed_dirs}" 2>/dev/null))
+      _describe -t keys 'bookmark keys' existing
+      _values -s ' ' 'suggested key' "${suggestions[@]}"
+      ;;
+  esac
+}

@@ -1,0 +1,38 @@
+# Shared variables and helpers for the bookmarks plugin
+
+# Use user-provided BOOKMARK_FILE if set; else default
+: ${BOOKMARK_FILE:="$HOME/.zsh_hashed_dirs"}
+
+# Track which keys were loaded in this session so we can remove/reload cleanly
+typeset -ga BOOKMARKS_LOADED
+BOOKMARKS_LOADED=()
+
+# Helper: exact existence check using awk on key
+_zb_has_key() {
+  local key=$1
+  [[ -z "$key" ]] && return 1
+  [[ -f "$BOOKMARK_FILE" ]] || return 1
+  awk -F= -v k="$key" 'NF && $1==k {exit 0} END{exit 1}' -- "$BOOKMARK_FILE"
+}
+
+# Helper: list keys from file
+_zb_list_keys() {
+  [[ -f "$BOOKMARK_FILE" ]] || return 0
+  awk -F= 'NF && $1!="" && $2!="" {print $1}' -- "$BOOKMARK_FILE"
+}
+
+# Helper: sanitize/validate keys (alnum, underscore, dash)
+_zb_validate_key() {
+  local key=$1
+  [[ "$key" =~ '^[A-Za-z0-9_-]+$' ]]
+}
+
+# Helper: create secure tmp file
+_zb_mktemp() {
+  mktemp "${BOOKMARK_FILE}.XXXXXX" 2>/dev/null || mktemp -t zsh_bookmarks 2>/dev/null
+}
+
+# Normalize directory: use physical directory path
+_zb_norm_pwd() {
+  builtin pwd -P
+}

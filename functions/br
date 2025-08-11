@@ -1,0 +1,29 @@
+# Remove a bookmark: br <key>
+# Deletes from file and named-dir hash.
+
+br() {
+  emulate -L zsh
+  setopt pipefail
+
+  local key=$1
+  if [[ -z "$key" ]]; then
+    echo "Usage: br <key>"
+    return 1
+  fi
+
+  if ! _zb_has_key "$key"; then
+    echo "No bookmark named '$key' found."
+    return 1
+  fi
+
+  local tmp
+  tmp=$(_zb_mktemp) || { print -u2 "Failed to create temporary file."; return 1; }
+  umask 077
+
+  awk -F= -v k="$key" '$1!=k' -- "$BOOKMARK_FILE" > "$tmp" || { rm -f -- "$tmp"; return 1; }
+  mv -f -- "$tmp" "$BOOKMARK_FILE" || { rm -f -- "$tmp"; return 1; }
+
+  hash -d -- "$key" 2>/dev/null || true
+  echo "Bookmark '$key' removed."
+  init_bookmarks
+}

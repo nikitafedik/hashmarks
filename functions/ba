@@ -1,0 +1,75 @@
+# Add a bookmark: ba [key] [dir]
+# - If key omitted or ".", defaults to basename of current directory.
+# - If dir omitted, uses current physical directory.
+# - Supports -f to force overwrite without prompt.
+
+ba() {
+  emulate -L zsh
+  setopt pipefail
+
+  local force=0
+  while [[ "$1" == "-f" ]]; do
+    force=1
+    shift
+  done
+
+  local key=${1:-}
+  local target=${2:-}
+
+  # Default key to current directory basename if missing or "."
+  if [[ -z "${key// }" || "$key" == "." ]]; then
+    key=${PWD:t}
+  fi
+
+  if ! _zb_validate_key "$key"; then
+    print -u2 "Invalid key: '$key' (allowed: letters, digits, underscore, dash)."
+    return 1
+  fi
+
+  # Determine target directory
+  if [[ -z "$target" ]]; then
+    target=$(_zb_norm_pwd)
+  else
+    # Expand ~ and make absolute physical path
+    case "$target" in
+      "~"*) target="${target/#\~/$HOME}" ;;
+    esac
+    target=$(builtin cd -- "$target" 2>/dev/null && builtin pwd -P) || {
+      print -u2 "Directory not found: $2"
+      return 1
+    }
+  fi
+
+  # Check existence and possibly prompt
+  if _zb_has_key "$key"; then
+    if (( force )); then
+      :
+    else
+      local existing_dir
+      existing_dir=$(awk -F= -v k="$key" '$1==k{print $2; exit}' -- "$BOOKMARK_FILE")
+      printf "Bookmark '%s' exists (set as '%s'). Override? [y/N]: " "$key" "$existing_dir"
+      local ans
+      read -r ans
+      [[ "$ans" == "y" || "$ans" == "Y" ]] || { echo "Aborted – bookmark not overwritten."; return 1; }
+    fi
+  fi
+
+  # Atomic rewrite: remove existing key, append new, sort
+  local tmp
+  tmp=$(_zb_mktemp) || { print -u2 "Failed to create temporary file."; return 1; }
+  # Preserve permissions reasonably
+  umask 077
+
+  if [[ -f "$BOOKMARK_FILE" ]]; then
+    awk -F= -v k="$key" '$1!=k' -- "$BOOKMARK_FILE" > "$tmp" || { rm -f -- "$tmp"; return 1; }
+  else
+    : > "$tmp"
+  fi
+
+  printf '%s=%s\n' "$key" "$target" >> "$tmp" || { rm -f -- "$tmp"; return 1; }
+  sort -o "$tmp" "$tmp" 2>/dev/null || true
+  mv -f -- "$tmp" "$BOOKMARK_FILE" || { rm -f -- "$tmp"; return 1; }
+
+  echo "Bookmark '$key' added for: $target"
+  init_bookmarks
+}
