@@ -27,7 +27,7 @@ br() {
   mv -f -- "$tmp" "$file" || { rm -f -- "$tmp"; return 1; }
 
   # Immediately unhash and update loaded list
-  hash -d -- "$key" 2>/dev/null || true
+  hash -d "$key" 2>/dev/null || true
   if (( ${+BOOKMARKS_LOADED} )); then
     BOOKMARKS_LOADED=(${${BOOKMARKS_LOADED:#$key}})
   fi

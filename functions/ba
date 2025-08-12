@@ -75,7 +75,7 @@ ba() {
   mv -f -- "$tmp" "$file" || { rm -f -- "$tmp"; return 1; }
 
     # Immediately hash named directory and track it
-    hash -d -- "$key=$target" 2>/dev/null || true
+    hash -d "$key=$target" 2>/dev/null || true
     typeset -ga BOOKMARKS_LOADED
     (( ${+BOOKMARKS_LOADED} )) || BOOKMARKS_LOADED=()
     if (( ${BOOKMARKS_LOADED[(I)$key]} == 0 )); then

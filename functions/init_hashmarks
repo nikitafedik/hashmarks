@@ -27,12 +27,12 @@ init_hashmarks() {
       esac
       # Only set if directory exists; tolerate non-existent but warn
       if [[ -d "$dir" ]]; then
-        hash -d -- "$key=$dir" 2>/dev/null || true
+        hash -d "$key=$dir" 2>/dev/null || true
         BOOKMARKS_LOADED+=("$key")
       else
         # Still set, but it may break tilde usage for that key; choose policy:
         # Comment next two lines to skip non-existent targets.
-        hash -d -- "$key=$dir" 2>/dev/null || true
+        hash -d "$key=$dir" 2>/dev/null || true
         BOOKMARKS_LOADED+=("$key")
       fi
   done < "$file"
