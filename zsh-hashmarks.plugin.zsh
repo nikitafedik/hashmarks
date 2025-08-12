@@ -1,8 +1,9 @@
 # Entrypoint for the plugin
 # Adds functions to fpath, sets defaults, and initializes in interactive shells.
 
-# Ensure functions/ is in $fpath
-_plugin_dir=${0:A:h}
+# Ensure functions/ is in $fpath (works when sourced)
+_plugin_file=${${(%):-%N}}
+_plugin_dir=${_plugin_file:A:h}
 if [[ -d ${_plugin_dir}/functions ]] && [[ -z ${fpath[(r)${_plugin_dir}/functions]} ]]; then
   fpath+=("${_plugin_dir}/functions")
 fi
@@ -11,73 +12,19 @@ fi
 unsetopt AUTO_NAME_DIRS 2>/dev/null
 
 autoload -Uz hashmarks_common init_hashmarks b ba br _b _ba _br 2>/dev/null
-# Ensure common helpers are loaded (defines _zb_* helpers)
+
+# Load helpers immediately so ba/br can call _zb_* funcs even in non-interactive scripts
 hashmarks_common 2>/dev/null || true
 
 if [[ -o interactive ]]; then
   hash -d -r 2>/dev/null
   init_hashmarks
 
-  compdef _b b
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-  compdef _ba ba
-  compdef _br br
+  if whence -w compdef >/dev/null 2>&1; then
+    compdef _b b
+    compdef _ba ba
+    compdef _br br
+  fi
 
   typeset -g _ZB_MTIME=""
   _zb_precmd_reload() {

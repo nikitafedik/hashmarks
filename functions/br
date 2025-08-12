@@ -4,6 +4,8 @@
 br() {
   emulate -L zsh
   setopt pipefail
+  # Ensure helpers are loaded
+  typeset -f _zb_validate_key >/dev/null 2>&1 || { hashmarks_common 2>/dev/null || true; }
 
   local key=$1
   if [[ -z "$key" ]]; then
