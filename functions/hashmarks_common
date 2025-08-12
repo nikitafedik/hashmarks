@@ -15,9 +15,16 @@ hashmarks_common() {
   _zb_has_key() {
     local key=$1
     [[ -z "$key" ]] && return 1
-  local file=$(_zb_file)
-  [[ -f "$file" ]] || return 1
-  awk -F= -v k="$key" 'NF && $1==k {exit 0} END{exit 1}' "$file"
+    local file=$(_zb_file)
+    [[ -f "$file" ]] || return 1
+    awk -F= -v k="$key" '
+      NF {
+        if ($1==k) found=1
+      }
+      END {
+        exit (found?0:1)
+      }
+    ' "$file"
   }
 
   # Helper: list keys from file
