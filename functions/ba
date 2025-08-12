@@ -74,6 +74,15 @@ ba() {
   sort -o "$tmp" "$tmp" 2>/dev/null || true
   mv -f -- "$tmp" "$file" || { rm -f -- "$tmp"; return 1; }
 
-  echo "Bookmark '$key' added for: $target"
-  init_hashmarks
+    # Immediately hash named directory and track it
+    hash -d -- "$key=$target" 2>/dev/null || true
+    typeset -ga BOOKMARKS_LOADED
+    (( ${+BOOKMARKS_LOADED} )) || BOOKMARKS_LOADED=()
+    if (( ${BOOKMARKS_LOADED[(I)$key]} == 0 )); then
+      BOOKMARKS_LOADED+=("$key")
+    fi
+
+    echo "Bookmark '$key' added for: $target"
+    # Fallback: reload everything (safe if other entries changed externally)
+    init_hashmarks
 }

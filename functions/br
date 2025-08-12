@@ -26,7 +26,13 @@ br() {
   awk -F= -v k="$key" '$1!=k' "$file" > "$tmp" || { rm -f -- "$tmp"; return 1; }
   mv -f -- "$tmp" "$file" || { rm -f -- "$tmp"; return 1; }
 
+  # Immediately unhash and update loaded list
   hash -d -- "$key" 2>/dev/null || true
+  if (( ${+BOOKMARKS_LOADED} )); then
+    BOOKMARKS_LOADED=(${${BOOKMARKS_LOADED:#$key}})
+  fi
+
   echo "Bookmark '$key' removed."
+  # Fallback: reload in case of external edits
   init_hashmarks
 }
