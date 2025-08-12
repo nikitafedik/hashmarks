@@ -2,39 +2,15 @@
 
 init_hashmarks() {
   emulate -L zsh
-  set -o errexit -o pipefail 2>/dev/null || true
-
-  # Remove previously loaded bookmarks from the hash table
-  local key
-  if (( ${+BOOKMARKS_LOADED} )); then
-    local key
-    for key in "${BOOKMARKS_LOADED[@]}"; do
-      hash -d "$key" 2>/dev/null || true
-    done
-  fi
-  BOOKMARKS_LOADED=()
-
-  # Load from file if exists
-  local file
+  # Minimal, robust: read file and (re)hash every entry; no state tracking
+  local file key dir
   file=$(_zb_file)
-  if [[ -f "$file" ]]; then
-    # Read lines safely; skip empty or malformed
+  [[ -r $file ]] || return 0
   while IFS='=' read -r key dir; do
-      [[ -z "$key" || -z "$dir" ]] && continue
-      # Expand leading ~ to HOME
-      case "$dir" in
-        "~"*) dir="${dir/#\~/$HOME}" ;;
-      esac
-      # Only set if directory exists; tolerate non-existent but warn
-      if [[ -d "$dir" ]]; then
-        hash -d "$key=$dir" 2>/dev/null || true
-        BOOKMARKS_LOADED+=("$key")
-      else
-        # Still set, but it may break tilde usage for that key; choose policy:
-        # Comment next two lines to skip non-existent targets.
-        hash -d "$key=$dir" 2>/dev/null || true
-        BOOKMARKS_LOADED+=("$key")
-      fi
+    [[ -z $key || -z $dir ]] && continue
+    case $dir in
+      "~"*) dir="${dir/#\~/$HOME}" ;;
+    esac
+    hash -d "$key=$dir" 2>/dev/null || true
   done < "$file"
-  fi
 }
