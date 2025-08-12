@@ -47,16 +47,21 @@ if [[ -o interactive ]]; then
     # Re-apply named dirs on every prompt; cheap and robust against clears
     init_hashmarks
     # Ensure ~named-dir completion works if compsys is active
-    autoload -Uz _tilde 2>/dev/null
-    if whence -w compdef >/dev/null 2>&1; then
-      if ! compdef | grep -q "~\\\*" 2>/dev/null; then
-        compdef -P '~*' _tilde 2>/dev/null || true
+    autoload -Uz _tilde 2>/dev/null || true
+    if whence -w compdef >/dev/null 2>&1 && typeset -p _comps >/dev/null 2>&1; then
+      # Only define once per session
+      if [[ -z ${_ZB_TILDE_DEFINED-} ]]; then
+        compdef -P '~*' _tilde >/dev/null 2>&1 || true
+        typeset -g _ZB_TILDE_DEFINED=1
       fi
     fi
   }
   autoload -U add-zsh-hook 2>/dev/null || true
   if whence -w add-zsh-hook >/dev/null 2>&1; then
     add-zsh-hook precmd _zb_precmd_reload
+    # Also ensure hashing occurs right before the line editor starts (after other precmds)
+    _zb_lineinit_rehash() { init_hashmarks }
+    add-zsh-hook zle-line-init _zb_lineinit_rehash
   else
     # Fallback: register via precmd_functions array
     typeset -ga precmd_functions
