@@ -15,9 +15,11 @@ autoload -Uz hashmarks_common init_hashmarks b ba br _b _ba _br 2>/dev/null
 # Load helpers immediately so ba/br can call _zb_* funcs even in non-interactive scripts
 hashmarks_common 2>/dev/null || true
 
+# Always load named directories from the bookmarks file once at source-time
+hash -d -r 2>/dev/null
+init_hashmarks
+
 if [[ -o interactive ]]; then
-  hash -d -r 2>/dev/null
-  init_hashmarks
 
   if whence -w compdef >/dev/null 2>&1; then
     compdef _b b
@@ -42,6 +44,12 @@ if [[ -o interactive ]]; then
     if [[ "$mtime" != "$_ZB_MTIME" ]]; then
       _ZB_MTIME="$mtime"
       init_hashmarks
+        # Ensure ~named-dir completion works if compsys is active
+        autoload -Uz _tilde 2>/dev/null
+        # Associate words starting with ~ to _tilde unless already defined
+        if ! compdef | grep -q "~\\\*" 2>/dev/null; then
+          compdef -P '~*' _tilde 2>/dev/null || true
+        fi
     fi
   }
   autoload -U add-zsh-hook 2>/dev/null
