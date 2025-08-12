@@ -2,13 +2,16 @@
 
 init_hashmarks() {
   emulate -L zsh
-  set -o errexit -o nounset -o pipefail 2>/dev/null || true
+  set -o errexit -o pipefail 2>/dev/null || true
 
   # Remove previously loaded bookmarks from the hash table
   local key
-  for key in "${BOOKMARKS_LOADED[@]}"; do
-    hash -d -- "$key" 2>/dev/null || true
-  done
+  if (( ${+BOOKMARKS_LOADED} )); then
+    local key
+    for key in "${BOOKMARKS_LOADED[@]}"; do
+      hash -d -- "$key" 2>/dev/null || true
+    done
+  fi
   BOOKMARKS_LOADED=()
 
   # Load from file if exists

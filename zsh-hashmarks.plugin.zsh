@@ -30,26 +30,14 @@ if [[ -o interactive ]]; then
   typeset -g _ZB_MTIME=""
   typeset -g _ZB_FILE_PATH=""
   _zb_precmd_reload() {
-    local mtime file
-    file=$(_zb_file)
-    if [[ "$file" != "$_ZB_FILE_PATH" ]]; then
-      _ZB_FILE_PATH="$file"
-      mtime=""
-    fi
-    if [[ -f "$file" ]]; then
-      mtime=$(stat -f %m "$file" 2>/dev/null || stat -c %Y "$file" 2>/dev/null)
-    else
-      mtime="MISSING"
-    fi
-    if [[ "$mtime" != "$_ZB_MTIME" ]]; then
-      _ZB_MTIME="$mtime"
-      init_hashmarks
-        # Ensure ~named-dir completion works if compsys is active
-        autoload -Uz _tilde 2>/dev/null
-        # Associate words starting with ~ to _tilde unless already defined
-        if ! compdef | grep -q "~\\\*" 2>/dev/null; then
-          compdef -P '~*' _tilde 2>/dev/null || true
-        fi
+    # Re-apply named dirs on every prompt; cheap and robust against clears
+    init_hashmarks
+    # Ensure ~named-dir completion works if compsys is active
+    autoload -Uz _tilde 2>/dev/null
+    if whence -w compdef >/dev/null 2>&1; then
+      if ! compdef | grep -q "~\\\*" 2>/dev/null; then
+        compdef -P '~*' _tilde 2>/dev/null || true
+      fi
     fi
   }
   autoload -U add-zsh-hook 2>/dev/null
