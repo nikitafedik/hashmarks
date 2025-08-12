@@ -8,7 +8,7 @@ init_hashmarks() {
   typeset -ga BOOKMARKS_LOADED
   if (( ${#BOOKMARKS_LOADED[@]} )); then
     for key in "${BOOKMARKS_LOADED[@]}"; do
-      hash -d "$key" 2>/dev/null || true
+  unhash -d -- "$key" 2>/dev/null || hash -d "$key" 2>/dev/null || true
     done
   fi
   BOOKMARKS_LOADED=()
