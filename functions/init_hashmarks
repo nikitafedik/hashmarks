@@ -9,7 +9,7 @@ init_hashmarks() {
   if (( ${+BOOKMARKS_LOADED} )); then
     local key
     for key in "${BOOKMARKS_LOADED[@]}"; do
-      hash -d -- "$key" 2>/dev/null || true
+      hash -d "$key" 2>/dev/null || true
     done
   fi
   BOOKMARKS_LOADED=()
