@@ -2,8 +2,18 @@
 
 init_hashmarks() {
   emulate -L zsh
-  # Minimal, robust: read file and (re)hash every entry; no state tracking
   local file key dir
+
+  # Remove previously loaded named dirs tracked in BOOKMARKS_LOADED
+  typeset -ga BOOKMARKS_LOADED
+  if (( ${#BOOKMARKS_LOADED[@]} )); then
+    for key in "${BOOKMARKS_LOADED[@]}"; do
+      hash -d "$key" 2>/dev/null || true
+    done
+  fi
+  BOOKMARKS_LOADED=()
+
+  # Load and hash all entries from the file
   file=$(_zb_file)
   [[ -r $file ]] || return 0
   while IFS='=' read -r key dir; do
@@ -12,5 +22,6 @@ init_hashmarks() {
       "~"*) dir="${dir/#\~/$HOME}" ;;
     esac
     hash -d "$key=$dir" 2>/dev/null || true
+    BOOKMARKS_LOADED+=("$key")
   done < "$file"
 }
