@@ -2,8 +2,10 @@
 hashmarks_common() {
   emulate -L zsh
 
-  # Use user-provided BOOKMARK_FILE if set; else default
-  : ${BOOKMARK_FILE:="$HOME/.zsh_hashed_dirs"}
+  # Helper: resolve bookmarks file path without setting the variable
+  _zb_file() {
+    print -r -- "${BOOKMARK_FILE:-$HOME/.zsh_hashed_dirs}"
+  }
 
   # Track which keys were loaded in this session so we can remove/reload cleanly
   typeset -ga BOOKMARKS_LOADED
@@ -13,14 +15,16 @@ hashmarks_common() {
   _zb_has_key() {
     local key=$1
     [[ -z "$key" ]] && return 1
-    [[ -f "$BOOKMARK_FILE" ]] || return 1
-    awk -F= -v k="$key" 'NF && $1==k {exit 0} END{exit 1}' "$BOOKMARK_FILE"
+  local file=$(_zb_file)
+  [[ -f "$file" ]] || return 1
+  awk -F= -v k="$key" 'NF && $1==k {exit 0} END{exit 1}' "$file"
   }
 
   # Helper: list keys from file
   _zb_list_keys() {
-    [[ -f "$BOOKMARK_FILE" ]] || return 0
-    awk -F= 'NF && $1!="" && $2!="" {print $1}' "$BOOKMARK_FILE"
+  local file=$(_zb_file)
+  [[ -f "$file" ]] || return 0
+  awk -F= 'NF && $1!="" && $2!="" {print $1}' "$file"
   }
 
   # Helper: sanitize/validate keys (alnum, underscore, dash)
@@ -32,7 +36,8 @@ hashmarks_common() {
 
   # Helper: create secure tmp file
   _zb_mktemp() {
-    mktemp "${BOOKMARK_FILE}.XXXXXX" 2>/dev/null || mktemp -t zsh_bookmarks 2>/dev/null
+    local file=$(_zb_file)
+    mktemp "${file}.XXXXXX" 2>/dev/null || mktemp -t zsh_bookmarks 2>/dev/null
   }
 
   # Normalize directory: use physical directory path

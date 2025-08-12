@@ -48,7 +48,8 @@ ba() {
       :
     else
       local existing_dir
-  existing_dir=$(awk -F= -v k="$key" '$1==k{print $2; exit}' "$BOOKMARK_FILE")
+  local file; file=$(_zb_file)
+  existing_dir=$(awk -F= -v k="$key" '$1==k{print $2; exit}' "$file")
       printf "Bookmark '%s' exists (set as '%s'). Override? [y/N]: " "$key" "$existing_dir"
       local ans
       read -r ans
@@ -62,15 +63,16 @@ ba() {
   # Preserve permissions reasonably
   umask 077
 
-  if [[ -f "$BOOKMARK_FILE" ]]; then
-    awk -F= -v k="$key" '$1!=k' "$BOOKMARK_FILE" > "$tmp" || { rm -f -- "$tmp"; return 1; }
+  local file; file=$(_zb_file)
+  if [[ -f "$file" ]]; then
+    awk -F= -v k="$key" '$1!=k' "$file" > "$tmp" || { rm -f -- "$tmp"; return 1; }
   else
     : > "$tmp"
   fi
 
   printf '%s=%s\n' "$key" "$target" >> "$tmp" || { rm -f -- "$tmp"; return 1; }
   sort -o "$tmp" "$tmp" 2>/dev/null || true
-  mv -f -- "$tmp" "$BOOKMARK_FILE" || { rm -f -- "$tmp"; return 1; }
+  mv -f -- "$tmp" "$file" || { rm -f -- "$tmp"; return 1; }
 
   echo "Bookmark '$key' added for: $target"
   init_hashmarks

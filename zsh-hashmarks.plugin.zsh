@@ -8,7 +8,6 @@ if [[ -d ${_plugin_dir}/functions ]] && [[ -z ${fpath[(r)${_plugin_dir}/function
   fpath+=("${_plugin_dir}/functions")
 fi
 
-: ${BOOKMARK_FILE:="$HOME/.zsh_hashed_dirs"}
 unsetopt AUTO_NAME_DIRS 2>/dev/null
 
 autoload -Uz hashmarks_common init_hashmarks b ba br _b _ba _br 2>/dev/null
@@ -27,10 +26,16 @@ if [[ -o interactive ]]; then
   fi
 
   typeset -g _ZB_MTIME=""
+  typeset -g _ZB_FILE_PATH=""
   _zb_precmd_reload() {
-    local mtime
-    if [[ -f "$BOOKMARK_FILE" ]]; then
-      mtime=$(stat -f %m "$BOOKMARK_FILE" 2>/dev/null || stat -c %Y "$BOOKMARK_FILE" 2>/dev/null)
+    local mtime file
+    file=$(_zb_file)
+    if [[ "$file" != "$_ZB_FILE_PATH" ]]; then
+      _ZB_FILE_PATH="$file"
+      mtime=""
+    fi
+    if [[ -f "$file" ]]; then
+      mtime=$(stat -f %m "$file" 2>/dev/null || stat -c %Y "$file" 2>/dev/null)
     else
       mtime="MISSING"
     fi

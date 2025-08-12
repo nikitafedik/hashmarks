@@ -5,13 +5,16 @@ b() {
   setopt pipefail
 
   echo "📕 BOOKMARKS ============================"
-  if [[ -f "$BOOKMARK_FILE" ]]; then
+  local file
+  typeset -f _zb_file >/dev/null 2>&1 || { hashmarks_common 2>/dev/null || true; }
+  file=$(_zb_file)
+  if [[ -f "$file" ]]; then
     # Pretty print with awk for exact parsing and alignment
   awk -F= 'NF && $1!="" && $2!="" {
       printf "\033[1;34m%-20s\033[0m %s\n", $1, $2
-  }' "$BOOKMARK_FILE"
+  }' "$file"
   else
-    echo "No bookmarks set."
+  echo "No bookmarks in $file."
   fi
   echo "========================================="
 }
