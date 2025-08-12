@@ -4,7 +4,7 @@
 _br() {
   local -a keys
   if [[ -f "${BOOKMARK_FILE:-$HOME/.zsh_hashed_dirs}" ]]; then
-    keys=($(_call_program keys awk -F= 'NF{print $1}' -- "${BOOKMARK_FILE:-$HOME/.zsh_hashed_dirs}" 2>/dev/null))
+    keys=($(_call_program keys awk -F= 'NF{print $1}' "${BOOKMARK_FILE:-$HOME/.zsh_hashed_dirs}" 2>/dev/null))
   else
     keys=()
   fi

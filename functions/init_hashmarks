@@ -14,7 +14,7 @@ init_hashmarks() {
   # Load from file if exists
   if [[ -f "$BOOKMARK_FILE" ]]; then
     # Read lines safely; skip empty or malformed
-    while IFS='=' read -r key dir; do
+  while IFS='=' read -r key dir; do
       [[ -z "$key" || -z "$dir" ]] && continue
       # Expand leading ~ to HOME
       case "$dir" in
@@ -30,6 +30,6 @@ init_hashmarks() {
         hash -d -- "$key=$dir" 2>/dev/null || true
         BOOKMARKS_LOADED+=("$key")
       fi
-    done < "$BOOKMARK_FILE"
+  done < "$BOOKMARK_FILE"
   fi
 }

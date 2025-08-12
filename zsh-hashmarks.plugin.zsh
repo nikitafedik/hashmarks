@@ -19,6 +19,63 @@ if [[ -o interactive ]]; then
   init_hashmarks
 
   compdef _b b
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
   compdef _ba ba
   compdef _br br
 

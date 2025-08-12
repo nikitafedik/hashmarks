@@ -13,8 +13,8 @@ _ba() {
     key)
       local -a suggestions
       suggestions=("${PWD:t}")
-      local -a existing
-      existing=($(_call_program keys awk -F= 'NF{print $1}' -- "${BOOKMARK_FILE:-$HOME/.zsh_hashed_dirs}" 2>/dev/null))
+  local -a existing
+  existing=($(_call_program keys awk -F= 'NF{print $1}' "${BOOKMARK_FILE:-$HOME/.zsh_hashed_dirs}" 2>/dev/null))
       _describe -t keys 'bookmark keys' existing
       _values -s ' ' 'suggested key' "${suggestions[@]}"
       ;;

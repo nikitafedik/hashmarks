@@ -20,10 +20,10 @@ br() {
   tmp=$(_zb_mktemp) || { print -u2 "Failed to create temporary file."; return 1; }
   umask 077
 
-  awk -F= -v k="$key" '$1!=k' -- "$BOOKMARK_FILE" > "$tmp" || { rm -f -- "$tmp"; return 1; }
+  awk -F= -v k="$key" '$1!=k' "$BOOKMARK_FILE" > "$tmp" || { rm -f -- "$tmp"; return 1; }
   mv -f -- "$tmp" "$BOOKMARK_FILE" || { rm -f -- "$tmp"; return 1; }
 
   hash -d -- "$key" 2>/dev/null || true
   echo "Bookmark '$key' removed."
-  init_bookmarks
+  init_hashmarks
 }
