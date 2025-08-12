@@ -14,7 +14,7 @@ fi
 unsetopt AUTO_NAME_DIRS 2>/dev/null
 
 # Autoload functions
-autoload -Uz bookmark_common init_bookmarks b ba br _b _ba _br 2>/dev/null
+autoload -Uz hashmarks_common init_hashmarks b ba br _b _ba _br 2>/dev/null
 
 # Only initialize in interactive shells
 if [[ -o interactive ]]; then
