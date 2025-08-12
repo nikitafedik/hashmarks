@@ -1,6 +1,6 @@
 # Load bookmarks from BOOKMARK_FILE into named directory hash table.
 
-init_bookmarks() {
+init_hashmarks() {
   emulate -L zsh
   set -o errexit -o nounset -o pipefail 2>/dev/null || true
 

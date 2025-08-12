@@ -24,7 +24,11 @@ _zb_list_keys() {
 # Helper: sanitize/validate keys (alnum, underscore, dash)
 _zb_validate_key() {
   local key=$1
-  [[ "$key" =~ '^[A-Za-z0-9_-]+$' ]]
+  [[ -z $key ]] && return 1
+  if [[ $key == (|*[^A-Za-z0-9_-]*|) ]]; then
+    return 1
+  fi
+  return 0
 }
 
 # Helper: create secure tmp file
