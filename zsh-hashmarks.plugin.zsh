@@ -54,14 +54,18 @@ if [[ -o interactive ]]; then
         compdef -P '~*' _tilde >/dev/null 2>&1 || true
         typeset -g _ZB_TILDE_DEFINED=1
       fi
+      # Ensure command completions for b/ba/br are defined once compsys is active
+      if [[ -z ${_ZB_CMD_COMPLETIONS-} ]]; then
+        compdef _b b 2>/dev/null || true
+        compdef _ba ba 2>/dev/null || true
+        compdef _br br 2>/dev/null || true
+        typeset -g _ZB_CMD_COMPLETIONS=1
+      fi
     fi
   }
   autoload -U add-zsh-hook 2>/dev/null || true
   if whence -w add-zsh-hook >/dev/null 2>&1; then
     add-zsh-hook precmd _zb_precmd_reload
-    # Also ensure hashing occurs right before the line editor starts (after other precmds)
-    _zb_lineinit_rehash() { init_hashmarks }
-    add-zsh-hook zle-line-init _zb_lineinit_rehash
   else
     # Fallback: register via precmd_functions array
     typeset -ga precmd_functions
