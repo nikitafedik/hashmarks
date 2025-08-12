@@ -9,6 +9,12 @@ hashmarks lets you use Zsh “named directories” as lightweight, shell-native 
 
 The whole idea of this small plugin is to leverage native Zsh’s `hash -d` under the hood.
 
+> [!NOTE]  
+> This is an early stage side project initially written for personal use. It is provided as‑is, without any warranty or liability.    
+> Before using, make sure to back up your current hashed directories (hash -d) to avoid losing existing bookmarks.    
+> Your feedback and suggestions are welcome! Feel free to open an issue/pull request/message me to help improve the plugin.    
+
+
 ---
 
 ## Features
@@ -126,7 +132,4 @@ ls ~pkgs               # use anywhere a path is accepted
 br proj                # remove
 ```
 
-> [!NOTE]  
-> This is an early stage side project initially written for personal use. It is provided as‑is, without any warranty or liability.
-> Before using, make sure to back up your current hashed directories (hash -d) to avoid losing existing bookmarks.
-> Your feedback and suggestions are welcome! Feel free to open an issue/pull request/message me to help improve the plugin.
+
