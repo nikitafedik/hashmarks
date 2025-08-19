@@ -47,7 +47,7 @@ zimfw install && zimfw update
 > `unsetopt AUTO_NAME_DIRS`    
 > `zstyle ':completion:*' users`    
 > `zstyle ':completion:*:named-directories' format '%d -> %p'`    
->  zstyle ':completion:*:hashed-directories' format '%d -> %p'`     
+>  `zstyle ':completion:*:hashed-directories' format '%d -> %p'`     
 
 ---
 
