@@ -43,12 +43,11 @@ zimfw install && zimfw update
 [ℹ️ More pluging managers will be tested and documented soon ]
 
 > [!IMPORTANT]
-> Before using, make sure that you *save your current hashed dirs* somewhere as they can get lost
-> modify completion styles in your .zshrc: 
-> `unsetopt AUTO_NAME_DIRS`
-> `zstyle ':completion:*' users`
-> `zstyle ':completion:*:named-directories' format '%d -> %p'`
->  zstyle ':completion:*:hashed-directories' format '%d -> %p'`  
+> modify completion styles in your .zshrc:    
+> `unsetopt AUTO_NAME_DIRS`    
+> `zstyle ':completion:*' users`    
+> `zstyle ':completion:*:named-directories' format '%d -> %p'`    
+>  zstyle ':completion:*:hashed-directories' format '%d -> %p'`     
 
 ---
 
